@@ -79,7 +79,7 @@ rl
 		_.sortBy(comps, '_s').forEach(function(comp){
 			fields.forEach(function(field){
 				if(typeof comp[field] === 'undefined') comp[field] = ''
-					stream_csv.write(`${comp[field]},`)
+					stream_csv.write(`"${comp[field]}",`)
 			})
 			stream_csv.write('\n')
 		})
@@ -95,7 +95,8 @@ rl
 		stream_seeed.write(['Part/Designator','Manufacture Part Number/Seeed SKU','Quantity'].join(',') + '\n')
 		for(compset in grouped){
 			var refs = _.pluck(grouped[compset], 'Reference')
-			stream_seeed.write(`"${refs.join(',')}",${grouped[compset][0].MPN},${refs.length}\n`)
+			//skip those without MPN's
+			if(grouped[compset][0].MPN !== '') stream_seeed.write(`"${refs.join(',')}","${grouped[compset][0].MPN}","${refs.length}"\n`)
 		}
 		stream_seeed.end();
 		console.log('written out seeed csv')
