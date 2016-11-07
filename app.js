@@ -1,5 +1,5 @@
 if (process.argv.length <= 2) {
-    console.log("Usage: " + __filename + " <eeschema name>.sch");
+    console.log("usage: " + __filename + " <eeschema name>.sch");
     process.exit(-1);
 }
 
@@ -24,11 +24,11 @@ var fields = []
 
 rl
 .on('line', (input) => {
-	
+	//component start
 	if(input.indexOf('$Comp')==0){
 		comp = {}
 	}
-	
+	//component end: process
 	if(input.indexOf('$EndComp')==0){
 		//skip nets/flags, only do components
 		if(
@@ -44,10 +44,10 @@ rl
 			//push to component list
 			comps.push(comp)
 			//print
-			console.log(comp)
+			//console.log(comp)
 		}
 	}
-	
+	//fields we may be interested in
 	if(input.indexOf('F')==0){
 		let prop = input.split(' ')
 		switch(prop[1]){
@@ -69,9 +69,6 @@ rl
 		//catch 2-part components
 		if(input.indexOf('1')!=2) comp.subComponent = true
 	}
-	
-	//console.log(input)
-	
 })
 .on('close', (input) => {
 	
@@ -87,11 +84,11 @@ rl
 			stream_csv.write('\n')
 		})
 		stream_csv.end();
+		console.log('written out csv')
 	});
 	
 	//pump out grouped
 	var grouped = _.groupBy(_.sortBy(comps, '_s'), '_g');
-	console.log(grouped)
 
 	var stream_seeed = fs.createWriteStream(`${src}.bom.seeed.csv`);
 	stream_seeed.once('open', function(fd){
@@ -101,7 +98,7 @@ rl
 			stream_seeed.write(`"${refs.join(',')}",${grouped[compset][0].MPN},${refs.length}\n`)
 		}
 		stream_seeed.end();
+		console.log('written out seeed csv')
 	});
-	
-	console.log('done.')
+
 })
